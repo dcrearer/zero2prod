@@ -1,4 +1,4 @@
-name: Rust
+name: Continuous Integration
 
 on:
   # NB: this differs from the book's project!
