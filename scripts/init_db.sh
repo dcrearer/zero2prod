@@ -19,11 +19,11 @@ APP_USER="${APP_USER:=app}"
 APP_USER_PWD="${APP_USER_PWD:=secret}"
 APP_DB_NAME="${APP_DB_NAME:=newsletter}"
 
-if [[ -z "${SKIP_PODMAN}" ]]
+if [[ -z "${SKIP_DOCKER}" ]]
 then
   # Launch postgres using Docker
   CONTAINER_NAME="postgres"
-  podman run --rm \
+  docker run --rm \
   --env POSTGRES_USER=${SUPERUSER} \
   --env POSTGRES_PASSWORD=${SUPERUSER_PWD} \
   --publish "${DB_PORT}":5432 \
@@ -33,7 +33,7 @@ then
   # ^ Increased maximum number of connections for testing purposes
 
   # Wait for Postgres to be ready to accept connections
-  until [ "$(podman inspect -f "{{.State.Status}}" ${CONTAINER_NAME})" = "running" ]; do
+  until [ "$(docker inspect -f "{{.State.Status}}" ${CONTAINER_NAME})" = "running" ]; do
    >&2 echo "Postgres is unavailable - sleeping"
   sleep
   done
@@ -44,11 +44,11 @@ then
 
   # Create the application user
   CREATE_QUERY="CREATE USER ${APP_USER} WITH PASSWORD '${APP_USER_PWD}';"
-  podman exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${CREATE_QUERY}"
+  docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${CREATE_QUERY}"
 
   # Grant create db privileges to the app user
   GRANT_QUERY="ALTER USER ${APP_USER} CREATEDB;"
-  podman exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${GRANT_QUERY}"
+  docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${GRANT_QUERY}"
 fi
 
 DATABASE_URL=postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_DB_NAME}
