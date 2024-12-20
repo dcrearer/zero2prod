@@ -1,13 +1,13 @@
 //! tests/health_check.rs
 
-use std::net::TcpListener;
+use secrecy::{ExposeSecret, Secret};
 use sqlx::{Connection, Executor, PgConnection, PgPool};
+use std::net::TcpListener;
+use std::sync::LazyLock;
+use uuid::Uuid;
 use zero2prod::configuration::{get_configuration, DatabaseSettings};
 use zero2prod::startup::run;
 use zero2prod::telemetry::{get_subscriber, init_subscriber};
-use uuid::Uuid;
-use std::sync::LazyLock;
-use secrecy::{ExposeSecret, Secret};
 
 static TRACING: LazyLock<()> = LazyLock::new(|| {
     let default_filter_level = "info".to_string();
@@ -30,22 +30,18 @@ pub struct TestApp {
 async fn spawn_app() -> TestApp {
     LazyLock::force(&TRACING);
 
-    let listener = TcpListener::bind("127.0.0.1:0")
-        .expect("Failed to bind random port");
+    let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
 
     let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
 
-    let mut configuration = get_configuration()
-        .expect("Failed to read configuration");
+    let mut configuration = get_configuration().expect("Failed to read configuration");
 
     configuration.database.database_name = Uuid::new_v4().to_string();
 
-    let connection_pool = configure_database(&configuration.database)
-        .await;
+    let connection_pool = configure_database(&configuration.database).await;
 
-    let server = run(listener, connection_pool.clone())
-        .expect("Failed to bind to address");
+    let server = run(listener, connection_pool.clone()).expect("Failed to bind to address");
 
     let _ = tokio::spawn(server);
     TestApp {
@@ -106,7 +102,7 @@ async fn subscribe_returns_a_200_for_valid_data() {
 
     let response = client
         .post(&format!("{}/subscriptions", &app.address))
-        .header("Content-Type", "application/x-www-form-urlencoded",)
+        .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body)
         .send()
         .await
@@ -119,8 +115,8 @@ async fn subscribe_returns_a_200_for_valid_data() {
         .await
         .expect("Failed to fetch saved subscription.");
 
-        assert_eq!(saved.email, "ursula_le_guin@gmail.com");
-        assert_eq!(saved.name, "le guin");
+    assert_eq!(saved.email, "ursula_le_guin@gmail.com");
+    assert_eq!(saved.name, "le guin");
 }
 
 #[tokio::test]
@@ -142,12 +138,11 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
             .await
             .expect("Failed to execute request.");
 
-            assert_eq!(
-                400,
-                response.status().as_u16(),
-                "The API did not fail with 400 Bad Request when the payload was {}.",
-                error_message
-            );
+        assert_eq!(
+            400,
+            response.status().as_u16(),
+            "The API did not fail with 400 Bad Request when the payload was {}.",
+            error_message
+        );
     }
 }
-
