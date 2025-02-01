@@ -1,0 +1,47 @@
+{
+	"info": {
+		"_postman_id": "6598fea9-dc07-4cce-8b15-b189e182d66f",
+		"name": "NewsLetter",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4486057"
+	},
+	"item": [
+		{
+			"name": "subscriptions",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "{{$randomUserName}}",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "{{$randomExampleEmail}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/subscriptions",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"subscriptions"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
