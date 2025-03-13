@@ -7,7 +7,7 @@ use uuid::Uuid;
 use zero2prod::{startup};
 use zero2prod::telemetry::{get_subscriber, init_subscriber};
 use std::sync::LazyLock;
-use secrecy::{ExposeSecret, Secret};
+use secrecy::{Secret};
 
 static TRACING: LazyLock<()> = LazyLock::new( || {
     let default_filter_level = "info".to_string();
@@ -137,8 +137,8 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
         ..config.clone()
     };
 
-    let mut connection = PgConnection::connect(
-        &maintenance_settings.connection_strings().expose_secret(),
+    let mut connection = PgConnection::connect_with(
+        &maintenance_settings.connection_options()
         )
         .await
         .expect("Failed to connect to Postgres");
@@ -149,7 +149,8 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .await
         .expect("Failed to create database.");
 
-    let connection_pool = PgPool::connect(&config.connection_strings().expose_secret()
+    let connection_pool = PgPool::connect_with(
+        config.connection_options()
         )
         .await
         .expect("Failed to connect to Postgres");
