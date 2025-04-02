@@ -1,0 +1,91 @@
+{
+  "info": {
+    "_postman_id": "6598fea9-dc07-4cce-8b15-b189e182d66f",
+    "name": "zero2prod - Dev",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "4486057"
+  },
+  "item": [
+    {
+      "name": "subscriptions",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "function generateUserCredentials() {",
+              "    // Generate random username once and store it",
+              "    const userName = pm.variables.replaceIn('{{$randomUserName}}');",
+              "    ",
+              "    // Set the username variable",
+              "    pm.variables.set('name', userName);",
+              "    ",
+              "    // Reuse the same userName value for email",
+              "    const userEmail = userName + '@src-trace.com';",
+              "    pm.variables.set('email', userEmail);",
+              "    ",
+              "    // Log the generated credentials",
+              "    console.info('Username: ' + userName);",
+              "    console.info('Email: ' + userEmail);",
+              "    ",
+              "    // Return the generated values if needed",
+              "    return {",
+              "        username: userName,",
+              "        email: userEmail",
+              "    };",
+              "}",
+              "// Usage:",
+              "generateUserCredentials();",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "name",
+              "value": "{{name}}",
+              "type": "text"
+            },
+            {
+              "key": "email",
+              "value": "{{email}}",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://{{host}}:{{port}}/{{path}}",
+          "protocol": "http",
+          "host": [
+            "127.0.0.1"
+          ],
+          "port": "8000",
+          "path": [
+            "subscriptions"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
