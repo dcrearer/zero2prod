@@ -103,5 +103,3 @@ impl DatabaseSettings {
             .database(&self.database_name)
     }
 }
-
-DATABASE_URL=postgresql://newsletter:AVNS_tuWEkZaN0PzjBeIjOvR@app-644b9859-4f67-4097-af24-80b3bc7b60b5-do-user-19708848-0.m.db.ondigitalocean.com:25060/newsletter?sslmode=require sqlx migrate run
