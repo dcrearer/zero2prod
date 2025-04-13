@@ -26,6 +26,8 @@ secrecy = { version = "0.8", features = ["serde"]}
 tracing-actix-web = "0.7"
 tracing-opentelemetry = "0.29"
 serde-aux = "4"
+unicode-segmentation = "1"
+validator = "0.18"
 opentelemetry = "0.28"
 opentelemetry-otlp = { version = "0.28", features = ["grpc-tonic"] }
 opentelemetry_sdk = { version = "0.28", features = ["rt-tokio-current-thread"] }
@@ -45,4 +47,10 @@ features = [
 
 [dev-dependencies]
 reqwest = "0.12"
+claims = "0.7"
+fake ="2.9"
+quickcheck = "1.0.3"
+quickcheck_macros = "1"
+rand = "0.8"
+
 
