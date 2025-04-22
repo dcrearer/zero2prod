@@ -7,7 +7,7 @@ pub struct EmailClient {
     http_client: Client,
     base_url: String,
     sender: SubscriberEmail,
-    authorization_token: Secret<String>
+    authorization_token: Secret<String>,
 }
 
 impl EmailClient {
@@ -15,39 +15,36 @@ impl EmailClient {
         base_url: String,
         sender: SubscriberEmail,
         authorization_token: Secret<String>,
-        timeout: std::time::Duration
+        timeout: std::time::Duration,
     ) -> Self {
-        let http_client = Client::builder()
-            .timeout(timeout)
-            .build()
-            .unwrap();
+        let http_client = Client::builder().timeout(timeout).build().unwrap();
         Self {
             http_client,
             base_url,
             sender,
-            authorization_token
+            authorization_token,
         }
     }
     pub async fn send_email(
-        &self, recipient: SubscriberEmail,
-        subject: &str, html_content: &str,
-        text_content: &str
-    ) -> Result<(), reqwest::Error>
-    {
+        &self,
+        recipient: SubscriberEmail,
+        subject: &str,
+        html_content: &str,
+        text_content: &str,
+    ) -> Result<(), reqwest::Error> {
         let url = format!("{}/email", self.base_url);
         let request_body = SendEmailRequest {
             from: self.sender.as_ref(),
             to: recipient.as_ref(),
-            subject: subject,
+            subject,
             html_body: html_content,
-            text_body: text_content
+            text_body: text_content,
         };
-        self
-            .http_client
+        self.http_client
             .post(&url)
             .header(
                 "X-Postmark-Server-Token",
-                self.authorization_token.expose_secret()
+                self.authorization_token.expose_secret(),
             )
             .json(&request_body)
             .send()
@@ -64,21 +61,21 @@ struct SendEmailRequest<'a> {
     to: &'a str,
     subject: &'a str,
     html_body: &'a str,
-    text_body: &'a str
+    text_body: &'a str,
 }
 
 #[cfg(test)]
 mod tests {
-    use claims::{assert_err, assert_ok};
     use crate::domain::SubscriberEmail;
     use crate::email_client::EmailClient;
+    use claims::{assert_err, assert_ok};
     use fake::faker::internet::en::SafeEmail;
     use fake::faker::lorem::en::{Paragraph, Sentence};
     use fake::{Fake, Faker};
-    use wiremock::matchers::{header_exists, header, path, method, any};
-    use wiremock::{Mock, MockServer, ResponseTemplate};
-    use wiremock::Request;
     use secrecy::Secret;
+    use wiremock::Request;
+    use wiremock::matchers::{any, header, header_exists, method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     fn subject() -> String {
         Sentence(1..2).fake()
@@ -94,9 +91,10 @@ mod tests {
 
     fn email_client(base_url: String) -> EmailClient {
         EmailClient::new(
-            base_url, email(),
+            base_url,
+            email(),
             Secret::new(Faker.fake()),
-            std::time::Duration::from_millis(200)
+            std::time::Duration::from_millis(200),
         )
     }
 
@@ -133,7 +131,8 @@ mod tests {
             .await;
 
         let _ = email_client
-            .send_email(email(), &subject(), &content(), &content()).await;
+            .send_email(email(), &subject(), &content(), &content())
+            .await;
 
         // Assert
     }
@@ -179,8 +178,7 @@ mod tests {
         let mock_server = MockServer::start().await;
         let email_client = email_client(mock_server.uri());
 
-        let response = ResponseTemplate::new(200)
-            .set_delay(std::time::Duration::from_secs(180));
+        let response = ResponseTemplate::new(200).set_delay(std::time::Duration::from_secs(180));
         Mock::given(any())
             .respond_with(response)
             .expect(1)

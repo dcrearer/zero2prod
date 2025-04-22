@@ -32,6 +32,8 @@ opentelemetry = "0.28"
 opentelemetry-otlp = { version = "0.28", features = ["grpc-tonic"] }
 opentelemetry_sdk = { version = "0.28", features = ["rt-tokio-current-thread"] }
 opentelemetry-semantic-conventions = "0.28"
+linkify = "0.10"
+rand = { version = "0.8", features = ["std_rng"] }
 
 [dependencies.sqlx]
 version = "0.8"
@@ -55,7 +57,6 @@ claims = "0.7"
 fake ="2.9"
 quickcheck = "1.0.3"
 quickcheck_macros = "1"
-rand = "0.8"
 tokio = { version = "1", features = ["rt", "macros"] }
 wiremock = "0.6"
 serde_json = "1"

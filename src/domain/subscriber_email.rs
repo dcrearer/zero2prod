@@ -24,10 +24,10 @@ impl AsRef<str> for SubscriberEmail {
 mod tests {
     use super::SubscriberEmail;
     use claims::assert_err;
-    use rand::rngs::StdRng;
-    use rand::SeedableRng;
-    use fake::faker::internet::en::SafeEmail;
     use fake::Fake;
+    use fake::faker::internet::en::SafeEmail;
+    use rand::SeedableRng;
+    use rand::rngs::StdRng;
 
     #[derive(Debug, Clone)]
     struct ValidEmailFixture(pub String);

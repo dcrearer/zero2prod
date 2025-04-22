@@ -1,17 +1,16 @@
 //! src/telemetry.rs
-use tracing_log::LogTracer;
-use tracing_subscriber::fmt::MakeWriter;
 use tracing::{Subscriber, subscriber::set_global_default};
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
-use tracing_subscriber::{layer::SubscriberExt, EnvFilter, Registry};
+use tracing_log::LogTracer;
+use tracing_subscriber::fmt::MakeWriter;
+use tracing_subscriber::{EnvFilter, Registry, layer::SubscriberExt};
 
-use std::sync::LazyLock;
 use opentelemetry::trace::TracerProvider;
-use opentelemetry::{global, KeyValue};
+use opentelemetry::{KeyValue, global};
 use opentelemetry_otlp::WithExportConfig;
-use opentelemetry_sdk::{propagation::TraceContextPropagator, Resource};
+use opentelemetry_sdk::{Resource, propagation::TraceContextPropagator};
 use opentelemetry_semantic_conventions::resource;
-
+use std::sync::LazyLock;
 
 const APP_NAME: &str = "zero2prod";
 
@@ -21,7 +20,8 @@ static RESOURCE: LazyLock<Resource> = LazyLock::new(|| {
         .build()
 });
 pub fn get_subscriber<Sink>(env_filter: String, sink: Sink) -> impl Subscriber + Send + Sync
-    where Sink: for<'a> MakeWriter<'a> + Send + Sync + 'static
+where
+    Sink: for<'a> MakeWriter<'a> + Send + Sync + 'static,
 {
     // Start a new otlp trace pipeline.
     // Spans are exported in batch - recommended setup for a production application.
@@ -39,13 +39,10 @@ pub fn get_subscriber<Sink>(env_filter: String, sink: Sink) -> impl Subscriber +
 
     // Filter based on level - trace, debug, info, warn, error
     // Tunable via `RUST_LOG` env variable
-    let env_filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new(env_filter));
+    let env_filter =
+        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(env_filter));
     let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
-    let formatting_layer = BunyanFormattingLayer::new(
-        APP_NAME.into(),
-        sink
-    );
+    let formatting_layer = BunyanFormattingLayer::new(APP_NAME.into(), sink);
     Registry::default()
         .with(env_filter)
         .with(telemetry)
