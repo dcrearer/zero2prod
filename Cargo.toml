@@ -34,6 +34,8 @@ opentelemetry_sdk = { version = "0.28", features = ["rt-tokio-current-thread"] }
 opentelemetry-semantic-conventions = "0.28"
 linkify = "0.10"
 rand = { version = "0.8", features = ["std_rng"] }
+thiserror = "1"
+anyhow = "1"
 
 [dependencies.sqlx]
 version = "0.8"

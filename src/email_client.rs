@@ -169,7 +169,7 @@ mod tests {
         let outcome = email_client
             .send_email(email(), &subject(), &content(), &content())
             .await;
-
+        dbg!(&outcome);
         assert_err!(outcome);
     }
 
