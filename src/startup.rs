@@ -1,13 +1,16 @@
 //! src/startup.rs
 use crate::configuration::{DatabaseSettings, Settings};
 use crate::email_client::EmailClient;
-use crate::routes::{confirm, health_check, publish_newsletters, subscribe};
+use crate::routes::{confirm, health_check, publish_newsletters, subscribe, get_metrics};
 use actix_web::dev::Server;
 use actix_web::{App, HttpServer, web};
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
 use std::net::TcpListener;
 use tracing_actix_web::TracingLogger;
+use crate::metrics::Metrics;
+use crate::middleware::MetricsMiddleware;
+
 
 pub struct Application {
     port: u16,
@@ -16,6 +19,10 @@ pub struct Application {
 
 impl Application {
     pub async fn build(configuration: Settings) -> Result<Self, std::io::Error> {
+        
+        let metrics = Metrics::new();
+        let metrics_data = web::Data::new(metrics);
+        
         let connection_pool = get_connection_pool(&configuration.database);
         let sender_email = configuration
             .email_client
@@ -39,6 +46,7 @@ impl Application {
             connection_pool,
             email_client,
             configuration.application.base_url,
+            metrics_data,
         )?;
 
         Ok(Self { port, server })
@@ -64,6 +72,7 @@ pub fn run(
     db_pool: PgPool,
     email_client: EmailClient,
     base_url: String,
+    metrics: web::Data<Metrics>,
 ) -> Result<Server, std::io::Error> {
     let db_pool = web::Data::new(db_pool);
     let email_client = web::Data::new(email_client);
@@ -71,13 +80,16 @@ pub fn run(
     let server = HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
+            .wrap(MetricsMiddleware::new(metrics.clone()))
             .route("/health_check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
             .route("/subscriptions/confirm", web::get().to(confirm))
             .route("/newsletters", web::post().to(publish_newsletters))
+            .route("/metrics", web::get().to(get_metrics))
             .app_data(base_url.clone())
             .app_data(db_pool.clone())
             .app_data(email_client.clone())
+            .app_data(metrics.clone())
     })
     .listen(listener)?
     .run();

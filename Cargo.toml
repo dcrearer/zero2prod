@@ -36,6 +36,9 @@ linkify = "0.10"
 rand = { version = "0.8", features = ["std_rng"] }
 thiserror = "1"
 anyhow = "1"
+futures = "0.3.31"
+prometheus = "0.14.0"
+opentelemetry-prometheus = "0.29.1"
 
 [dependencies.sqlx]
 version = "0.8"
