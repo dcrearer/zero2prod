@@ -36,6 +36,8 @@ linkify = "0.10"
 rand = { version = "0.8", features = ["std_rng"] }
 thiserror = "1"
 anyhow = "1"
+base64 = "0.22"
+argon2 = {version = "0.5", features = ["std"]}
 
 [dependencies.sqlx]
 version = "0.8"
