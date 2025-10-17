@@ -9,3 +9,7 @@ phases:
     commands:
       - cargo build --release
       - cargo test
+artifacts:
+  files:
+    - target/release/zero2prod
+  name: zero2prod-$(date +%Y-%m-%d)
