@@ -5,6 +5,11 @@ phases:
       - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       - source ~/.cargo/env
       - rustup default 1.90.0
+  pre_build:
+    commands:
+      - docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password postgres:13
+      - sleep 15
+      - export DATABASE_URL=postgres://postgres:password@localhost:5432/postgres
   build:
     commands:
       - cargo build --release
