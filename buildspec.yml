@@ -8,7 +8,7 @@ phases:
       - cargo install sqlx-cli --no-default-features --features postgres
   pre_build:
     commands:
-      - docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password postgres:13
+      - docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password public.ecr.aws/docker/library/postgres:13
       - sleep 15
       - export DATABASE_URL=postgres://postgres:password@localhost:5432/postgres
       - sqlx database create --database-url postgres://postgres:password@localhost:5432/newsletter
