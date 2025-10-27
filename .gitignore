@@ -1,1 +1,8 @@
+.idea
 /target
+deployment/
+target/
+.amazonq/
+.DS_Store
+.gitignore
+zero2prod
