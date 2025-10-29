@@ -6,6 +6,13 @@ phases:
       - . ~/.cargo/env
       - rustup default 1.90.0
       - cargo install sqlx-cli --no-default-features --features postgres
+      # Install Trivy
+      - apt-get update
+      - apt-get install -y wget apt-transport-https gnupg
+      - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
+      - echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | tee -a /etc/apt/sources.list.d/trivy.list
+      - apt-get update
+      - apt-get install -y trivy
   pre_build:
     commands:
       - docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password public.ecr.aws/docker/library/postgres:13
@@ -24,6 +31,8 @@ phases:
       - docker tag $IMAGE_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
   post_build:
     commands:
+      - echo Scanning image with Trivy...
+      - trivy --no-progress --exit-code 0 --severity HIGH,CRITICAL $IMAGE_REPO_NAME:latest
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest

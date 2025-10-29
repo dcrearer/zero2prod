@@ -1,4 +1,4 @@
-# base.yaml [local development]
+# base.yaml
 application:
   port: 8000
   host: "0.0.0.0"
