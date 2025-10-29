@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zero2prod-config
+data:
+  APP__DATABASE__HOST: "postgres-service"
+  APP__DATABASE__PORT: "5432"
+  APP__DATABASE__USERNAME: "postgres"
+  APP__DATABASE__DATABASE_NAME: "newsletter"
+  APP__APPLICATION__HOST: "0.0.0.0"
+  APP__APPLICATION__PORT: "8000"

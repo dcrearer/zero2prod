@@ -3,6 +3,7 @@
 deployment/
 target/
 .amazonq/
+scripts/slow_client
 .DS_Store
 .gitignore
 zero2prod

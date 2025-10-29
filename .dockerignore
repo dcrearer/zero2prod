@@ -1,0 +1,9 @@
+.amazonq/
+deployment/
+migrations/
+scripts/
+target/
+test/
+.env
+buildspec.yml
+Dockerfile

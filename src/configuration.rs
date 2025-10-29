@@ -1,19 +1,26 @@
-//! src/configurations.rs
+use config::{Config, Environment, File};
 use secrecy::{ExposeSecret, Secret};
+use serde::Deserialize;
 
-#[derive(serde::Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
-    pub application_port: u16,
+    pub application: ApplicationSettings,
 }
 
-#[derive(serde::Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct DatabaseSettings {
     pub username: String,
     pub password: Secret<String>,
     pub port: u16,
     pub host: String,
     pub database_name: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ApplicationSettings {
+    pub port: u16,
+    pub host: String,
 }
 
 impl DatabaseSettings {
@@ -30,11 +37,10 @@ impl DatabaseSettings {
 }
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
-    let settings = config::Config::builder()
-        .add_source(config::File::new(
-            "configuration.yaml",
-            config::FileFormat::Yaml,
-        ))
-        .build()?;
-    settings.try_deserialize::<Settings>()
+    Config::builder()
+        .add_source(File::with_name("configuration/base").required(false))
+        .add_source(File::with_name("configuration/local").required(false))
+        .add_source(Environment::with_prefix("APP").separator("__"))
+        .build()?
+        .try_deserialize()
 }

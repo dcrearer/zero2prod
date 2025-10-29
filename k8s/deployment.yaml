@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zero2prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: zero2prod
+  template:
+    metadata:
+      labels:
+        app: zero2prod
+    spec:
+      containers:
+      - name: zero2prod
+        image: zero2prod:latest
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: zero2prod-config
+        - secretRef:
+            name: zero2prod-secrets
+        livenessProbe:
+          httpGet:
+            path: /health_check
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health_check
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
