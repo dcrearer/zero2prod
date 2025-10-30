@@ -1,5 +1,5 @@
 # Builder stage
-FROM rust:1.90.0 AS builder
+FROM public.ecr.aws/docker/library/rust:1.90.0 AS builder
 
 WORKDIR /app
 RUN apt update && apt install lld clang -y
@@ -12,7 +12,7 @@ ENV SQLX_OFFLINE true
 RUN cargo build --release
 
 # Runtime stage
-FROM debian:bookworm-slim AS runtime
+FROM public.ecr.aws/docker/library/debian:bookworm-slim AS runtime
 
 WORKDIR /app
 
