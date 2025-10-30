@@ -32,7 +32,7 @@ phases:
   post_build:
     commands:
       - echo Scanning image with Trivy...
-      - trivy --no-progress --severity HIGH,CRITICAL $IMAGE_REPO_NAME:latest || echo "Vulnerabilities found but continuing..."
+      - trivy image $IMAGE_REPO_NAME:latest --quiet --severity HIGH,CRITICAL  || echo "Vulnerabilities found but continuing..."
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
