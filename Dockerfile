@@ -3,7 +3,11 @@ FROM rust:1.90.0 AS builder
 
 WORKDIR /app
 RUN apt update && apt install lld clang -y
-COPY . .
+COPY Cargo.toml Cargo.lock ./
+COPY src src
+COPY .sqlx .sqlx
+COPY migrations migrations
+COPY configuration configuration
 ENV SQLX_OFFLINE true
 RUN cargo build --release
 
@@ -23,7 +27,8 @@ RUN apt-get update -y \
 
 COPY --from=builder /app/target/release/zero2prod zero2prod
 COPY --from=builder /app/configuration configuration
-RUN chown appuser:appuser zero2prod
+COPY --from=builder /app/migrations migrations
+RUN chown -R appuser:appuser /app
 
 USER appuser
 EXPOSE 8000
