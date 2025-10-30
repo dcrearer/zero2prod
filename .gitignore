@@ -3,7 +3,9 @@
 deployment/
 target/
 .amazonq/
+terraform/
+k8s/
 scripts/slow_client
 .DS_Store
-.gitignore
 zero2prod
+.env
