@@ -4,7 +4,6 @@ deployment/
 target/
 .amazonq/
 terraform/
-k8s/
 scripts/slow_client
 .DS_Store
 zero2prod

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zero2prod-config
+data:
+  APP__APPLICATION__HOST: "0.0.0.0"
+  APP__APPLICATION__PORT: "8000"
+  APP__DATABASE__PORT: "5432"
+  APP__DATABASE__DATABASE_NAME: "newsletter"
+  APP__DATABASE__REQUIRE_SSL: "false"
+  APP__DATABASE__HOST: "localhost"

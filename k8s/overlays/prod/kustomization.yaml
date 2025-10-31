@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+
+patches:
+- path: deployment-patch.yaml
+  target:
+    kind: Deployment
+    name: zero2prod
+- path: configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: zero2prod-config
+- path: secret-patch.yaml
+  target:
+    kind: Secret
+    name: zero2prod-secret
+
+images:
+- name: PLACEHOLDER_IMAGE
+  newName: PLACEHOLDER_ECR_URL
+  newTag: latest
