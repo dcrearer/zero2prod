@@ -47,18 +47,8 @@ phases:
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
       - echo Generating Kubernetes patches with real values...
-      - echo "apiVersion: v1" > k8s/overlays/prod/configmap-patch.yaml
-      - echo "kind: ConfigMap" >> k8s/overlays/prod/configmap-patch.yaml  
-      - echo "metadata:" >> k8s/overlays/prod/configmap-patch.yaml
-      - echo "  name: zero2prod-config" >> k8s/overlays/prod/configmap-patch.yaml
-      - echo "data:" >> k8s/overlays/prod/configmap-patch.yaml
-      - echo "  APP__DATABASE__HOST: $DB_HOST" >> k8s/overlays/prod/configmap-patch.yaml
-      - echo "apiVersion: v1" > k8s/overlays/prod/secret-patch.yaml
-      - echo "kind: Secret" >> k8s/overlays/prod/secret-patch.yaml
-      - echo "metadata:" >> k8s/overlays/prod/secret-patch.yaml
-      - echo "  name: zero2prod-secret" >> k8s/overlays/prod/secret-patch.yaml
-      - echo "stringData:" >> k8s/overlays/prod/secret-patch.yaml
-      - echo "  APP__DATABASE__PASSWORD: $DB_PASSWORD" >> k8s/overlays/prod/secret-patch.yaml
+      - printf 'apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: zero2prod-config\ndata:\n  APP__DATABASE__HOST: %s\n' "$DB_HOST" > k8s/overlays/prod/configmap-patch.yaml
+      - printf 'apiVersion: v1\nkind: Secret\nmetadata:\n  name: zero2prod-secret\nstringData:\n  APP__DATABASE__PASSWORD: %s\n' "$DB_PASSWORD" > k8s/overlays/prod/secret-patch.yaml
       - echo Updating kustomization with new image tag...
       - sed -i "s|newTag:.*|newTag: $IMAGE_TAG|" k8s/overlays/prod/kustomization.yaml
       - sed -i "s|newName:.*|newName: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME|" k8s/overlays/prod/kustomization.yaml
