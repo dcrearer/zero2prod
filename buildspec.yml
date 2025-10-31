@@ -47,8 +47,8 @@ phases:
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
       - echo Generating Kubernetes patches with real values...
-      - 'printf "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: zero2prod-config\ndata:\n  APP__DATABASE__HOST: %s\n" "$DB_HOST" > k8s/overlays/prod/configmap-patch.yaml'
-      - 'printf "apiVersion: v1\nkind: Secret\nmetadata:\n  name: zero2prod-secret\nstringData:\n  APP__DATABASE__PASSWORD: %s\n" "$DB_PASSWORD" > k8s/overlays/prod/secret-patch.yaml'
+      - sed -i "s|PLACEHOLDER_DB_HOST|$DB_HOST|" k8s/overlays/prod/configmap-patch.yaml
+      - sed -i "s|PLACEHOLDER_DB_PASSWORD|$DB_PASSWORD|" k8s/overlays/prod/secret-patch.yaml
       - echo Updating kustomization with new image tag...
       - sed -i "s|newTag:.*|newTag: $IMAGE_TAG|" k8s/overlays/prod/kustomization.yaml
       - sed -i "s|newName:.*|newName: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME|" k8s/overlays/prod/kustomization.yaml
