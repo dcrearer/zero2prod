@@ -8,11 +8,14 @@ phases:
       - cargo install sqlx-cli --no-default-features --features postgres
       # Install Trivy
       - apt-get update
-      - apt-get install -y wget apt-transport-https gnupg
+      - apt-get install -y wget apt-transport-https gnupg jq curl
       - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
       - echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | tee -a /etc/apt/sources.list.d/trivy.list
       - apt-get update
       - apt-get install -y trivy
+      # Install kubectl
+      - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      - chmod +x kubectl && mv kubectl /usr/local/bin/
   pre_build:
     commands:
       - docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password public.ecr.aws/docker/library/postgres:13
@@ -23,11 +26,17 @@ phases:
       - sqlx migrate run
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - echo Getting database endpoint from RDS...
+      - DB_HOST=$(aws rds describe-db-clusters --db-cluster-identifier zero2prod-aurora --query 'DBClusters[0].Endpoint' --output text)
+      - echo Getting database password from Secrets Manager...
+      - DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id zero2prod/database/credentials --query 'SecretString' --output text | jq -r '.password')
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t $IMAGE_REPO_NAME .
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}
+      - docker tag $IMAGE_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
       - docker tag $IMAGE_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
   post_build:
     commands:
@@ -35,4 +44,39 @@ phases:
       - trivy image $IMAGE_REPO_NAME:latest --quiet --severity HIGH,CRITICAL  || echo "Vulnerabilities found but continuing..."
       - echo Build completed on `date`
       - echo Pushing the Docker image...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
+      - echo Generating Kubernetes patches with real values...
+      - |
+        cat > k8s/overlays/prod/configmap-patch.yaml << EOF
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: zero2prod-config
+        data:
+          APP__DATABASE__HOST: "$DB_HOST"
+        EOF
+      - |
+        cat > k8s/overlays/prod/secret-patch.yaml << EOF
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: zero2prod-secret
+        stringData:
+          APP__DATABASE__PASSWORD: "$DB_PASSWORD"
+        EOF
+      - echo Updating kustomization with new image tag...
+      - sed -i "s|newTag:.*|newTag: $IMAGE_TAG|" k8s/overlays/prod/kustomization.yaml
+      - sed -i "s|newName:.*|newName: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME|" k8s/overlays/prod/kustomization.yaml
+      - echo Configuring kubectl for EKS...
+      - aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name oxidize-k8s
+      - echo Deploying to EKS...
+      - kubectl apply -k k8s/overlays/prod/
+      - echo Waiting for deployment to be ready...
+      - kubectl rollout status deployment/zero2prod -n default --timeout=300s
+      - echo Getting service endpoint...
+      - kubectl get svc zero2prod-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || echo "Service endpoint not yet available"
+
+artifacts:
+  files:
+    - k8s/**/*
