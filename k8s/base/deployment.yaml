@@ -45,13 +45,13 @@ spec:
         livenessProbe:
           httpGet:
             path: /health_check
-            port: 8080
+            port: 8000
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health_check
-            port: 8080
+            port: 8000
           initialDelaySeconds: 5
           periodSeconds: 5
         volumeMounts:
