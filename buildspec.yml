@@ -49,7 +49,8 @@ phases:
       - sed -i "s|PLACEHOLDER_DB_PASSWORD|$DB_PASSWORD|" k8s/overlays/prod/secret-patch.yaml
       - echo Updating kustomization with new image tag...
       - sed -i "s|newTag:.*|newTag: $IMAGE_TAG|" k8s/overlays/prod/kustomization.yaml
-      - sed -i "s|newName:.*|newName: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME|" k8s/overlays/prod/kustomization.yaml
+      - ECR_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      - sed -i "s|newName:.*|newName: $ECR_URI|" k8s/overlays/prod/kustomization.yaml
       - echo Configuring kubectl for EKS...
       - aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name oxidize-k8s
       - echo Deploying to EKS...
