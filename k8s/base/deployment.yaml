@@ -23,7 +23,7 @@ spec:
       - name: zero2prod
         image: PLACEHOLDER_IMAGE
         ports:
-        - containerPort: 8000
+        - containerPort: 8080
         envFrom:
         - configMapRef:
             name: zero2prod-config
@@ -45,13 +45,13 @@ spec:
         livenessProbe:
           httpGet:
             path: /health_check
-            port: 8000
+            port: 8080
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health_check
-            port: 8000
+            port: 8080
           initialDelaySeconds: 5
           periodSeconds: 5
         volumeMounts:
