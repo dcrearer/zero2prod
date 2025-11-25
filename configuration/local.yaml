@@ -2,3 +2,5 @@ application:
   host: 0.0.0.0
 database:
   require_ssl: false
+email_client:
+  sender_email: "dcrearer@gmail.com"

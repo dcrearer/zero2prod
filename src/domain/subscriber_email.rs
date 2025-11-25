@@ -1,7 +1,7 @@
 //! src/domain/subscriber_email.rs
 use validator::ValidateEmail;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SubscriberEmail(String);
 
 impl SubscriberEmail {
@@ -20,16 +20,15 @@ impl AsRef<str> for SubscriberEmail {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::SubscriberEmail;
     use claims::assert_err;
-    use rand::rngs::StdRng;
-    use rand::SeedableRng;
-    use fake::faker::internet::en::SafeEmail;
     use fake::Fake;
+    use fake::faker::internet::en::SafeEmail;
     use quickcheck::Gen;
+    use rand::SeedableRng;
+    use rand::rngs::StdRng;
 
     #[derive(Debug, Clone)]
     struct ValidEmailFixture(pub String);
@@ -65,5 +64,4 @@ mod tests {
         let email = "@domain.com".to_string();
         assert_err!(SubscriberEmail::parse(email));
     }
-    
 }

@@ -1,20 +1,22 @@
+use crate::domain::SubscriberEmail;
 use config::{Config, Environment, File};
-use secrecy::{ExposeSecret, Secret};
+use secrecy::{ExposeSecret, SecretString};
 use serde::Deserialize;
 use serde_aux::field_attributes::deserialize_number_from_string;
 use sqlx::postgres::PgConnectOptions;
 use sqlx::postgres::PgSslMode;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
     pub application: ApplicationSettings,
+    pub email_client: EmailClientSettings,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct DatabaseSettings {
     pub username: String,
-    pub password: Secret<String>,
+    pub password: SecretString,
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub host: String,
@@ -22,11 +24,16 @@ pub struct DatabaseSettings {
     pub require_ssl: bool,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct ApplicationSettings {
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub host: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct EmailClientSettings {
+    pub sender_email: String,
 }
 
 impl DatabaseSettings {
@@ -44,6 +51,12 @@ impl DatabaseSettings {
             .port(self.port)
             .ssl_mode(ssl_mode)
             .database(&self.database_name)
+    }
+}
+
+impl EmailClientSettings {
+    pub fn sender(&self) -> Result<SubscriberEmail, String> {
+        SubscriberEmail::parse(self.sender_email.clone())
     }
 }
 
