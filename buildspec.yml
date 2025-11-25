@@ -57,7 +57,7 @@ phases:
       - echo Running database migrations on Aurora...
       - echo Re-fetching database credentials...
       - DB_HOST=$(aws rds describe-db-clusters --db-cluster-identifier zero2prod-aurora --query 'DBClusters[0].Endpoint' --output text)
-      - DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id zero2prod/database/credentials --query 'SecretString' --output text | jq -r '.password')
+      - DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id zero2prod/database//credentials-e842ece0 --query 'SecretString' --output text | jq -r '.password')
       - echo "DB_HOST is ${DB_HOST}"
       - export DATABASE_URL="postgresql://postgres:${DB_PASSWORD}@${DB_HOST}:5432/newsletter"
       - sqlx migrate run
