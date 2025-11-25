@@ -1,5 +1,5 @@
 # Builder stage
-FROM public.ecr.aws/docker/library/rust:1.90.0 AS builder
+FROM public.ecr.aws/docker/library/rust:1.90.0-bookworm AS builder
 
 WORKDIR /app
 RUN apt update && apt install lld clang -y
