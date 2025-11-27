@@ -37,8 +37,8 @@ impl EmailClient {
             .to_addresses(request.recipient.as_ref())
             .build();
 
-        let email_content = Self::build_email_content(request)
-            .map_err(SdkError::construction_failure)?;
+        let email_content =
+            Self::build_email_content(request).map_err(SdkError::construction_failure)?;
 
         self.ses_client
             .send_email()

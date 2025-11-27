@@ -4,8 +4,8 @@ use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::sync::LazyLock;
 use uuid::Uuid;
 use zero2prod::configuration::{DatabaseSettings, get_configuration};
-use zero2prod::telemetry::{get_subscriber, init_subscriber};
 use zero2prod::startup::Application;
+use zero2prod::telemetry::{get_subscriber, init_subscriber};
 
 static TRACING: LazyLock<()> = LazyLock::new(|| {
     let default_filter_level = "info".to_string();
@@ -34,9 +34,8 @@ pub async fn spawn_app() -> TestApp {
         c
     };
 
-    
     let connection_pool = configure_database(&configuration.database).await;
-    
+
     let application = Application::build(configuration.clone())
         .await
         .expect("Failed to build server");
@@ -81,11 +80,11 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
 impl TestApp {
     pub async fn post_subscription(&self, body: String) -> reqwest::Response {
         reqwest::Client::new()
-        .post(format!("{}/subscriptions", &self.address))
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .body(body)
-        .send()
-        .await
-        .expect("Failed to execute request")
+            .post(format!("{}/subscriptions", &self.address))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
+            .send()
+            .await
+            .expect("Failed to execute request")
     }
 }

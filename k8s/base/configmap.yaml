@@ -7,6 +7,7 @@ metadata:
 data:
   APP__APPLICATION__HOST: "0.0.0.0"
   APP__APPLICATION__PORT: "8000"
+  APP__APPLICATION__BASE_URL: "http://k8s-default-zero2pro-1b0fed5beb-1619261688.us-east-1.elb.amazonaws.com"
   APP__DATABASE__PORT: "5432"
   APP__DATABASE__DATABASE_NAME: "newsletter"
   APP__DATABASE__REQUIRE_SSL: "false"
