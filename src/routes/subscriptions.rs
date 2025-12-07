@@ -2,6 +2,7 @@
 use crate::domain::{NewSubscriber, SubscriberEmail, SubscriberName};
 use crate::email_client::{EmailClient, SendEmailRequest};
 use crate::startup::ApplicationBaseUrl;
+use crate::metrics::SUBSCRIPTION_REQUESTS;
 use actix_web::{HttpResponse, web, ResponseError};
 use actix_web::http::StatusCode;
 use chrono::Utc;
@@ -103,6 +104,8 @@ pub async fn subscribe(
     email_client: web::Data<EmailClient>,
     base_url: web::Data<ApplicationBaseUrl>,
 ) -> Result<HttpResponse, SubscribeError> {
+    SUBSCRIPTION_REQUESTS.inc();
+    
     let new_subscriber = form.0.try_into()
         .map_err(SubscribeError::ValidationError)?;
 
