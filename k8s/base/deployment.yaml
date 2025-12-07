@@ -14,7 +14,6 @@ spec:
       labels:
         app: zero2prod
     spec:
-      serviceAccountName: zero2prod-sa
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000

@@ -3,13 +3,20 @@ use crate::configuration::{DatabaseSettings, Settings};
 use crate::email_client::EmailClient;
 use crate::routes::confirm;
 use crate::routes::{health_check, subscribe};
+use crate::metrics;
 use actix_web::dev::Server;
 use actix_web::web::Data;
-use actix_web::{App, HttpServer, web};
+use actix_web::{App, HttpResponse, HttpServer, web};
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
 use std::net::TcpListener;
 use tracing_actix_web::TracingLogger;
+
+async fn metrics_endpoint() -> HttpResponse {
+    HttpResponse::Ok()
+        .content_type("text/plain; version=0.0.4")
+        .body(metrics::metrics_handler())
+}
 
 pub struct Application {
     port: u16,
@@ -68,6 +75,7 @@ pub fn run(
         App::new()
             .wrap(TracingLogger::default())
             .route("/health_check", web::get().to(health_check))
+            .route("/metrics", web::get().to(metrics_endpoint))
             .route("/subscriptions", web::post().to(subscribe))
             .route("/subscriptions/confirm", web::get().to(confirm))
             .app_data(db_pool.clone())

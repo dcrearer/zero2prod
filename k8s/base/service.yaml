@@ -4,6 +4,10 @@ metadata:
   name: zero2prod-service
   labels:
     app: zero2prod
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8000"
+    prometheus.io/path: "/metrics"
 spec:
   selector:
     app: zero2prod
