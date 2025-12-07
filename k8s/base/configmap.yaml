@@ -5,6 +5,7 @@ metadata:
   labels:
     app: zero2prod
 data:
+  AWS_REGION: "us-east-1"
   APP__APPLICATION__HOST: "0.0.0.0"
   APP__APPLICATION__PORT: "8000"
   APP__APPLICATION__BASE_URL: "http://k8s-default-zero2pro-1b0fed5beb-1619261688.us-east-1.elb.amazonaws.com"

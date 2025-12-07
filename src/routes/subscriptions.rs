@@ -120,8 +120,7 @@ pub async fn subscribe(
     store_token(&mut transaction, subscriber_id, &subscriber_token)
         .await
         .context("Failed to store the confirmation token for a new subscriber.")?;
-
-
+    
     transaction
         .commit()
         .await
