@@ -2,7 +2,7 @@
 set -e
 
 echo "Running cargo release..."
-cargo release minor --execute
+cargo release minor --no-publish --execute
 
 echo "Building debug binary with new version..."
 cargo build
