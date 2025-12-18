@@ -27,4 +27,5 @@ RUN chown appuser:appuser zero2prod
 
 USER appuser
 EXPOSE 8000
+ENV APP_ENVIRONMENT production
 ENTRYPOINT ["./zero2prod"]
