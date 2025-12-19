@@ -1,6 +1,7 @@
 //! tests/health_check.rs
 use assert2::assert;
 use rstest::rstest;
+use secrecy::SecretBox;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
 use std::sync::LazyLock;
@@ -8,7 +9,6 @@ use uuid::Uuid;
 use zero2prod::configuration::{DatabaseSettings, get_configuration};
 use zero2prod::startup;
 use zero2prod::telemetry::{get_subscriber, init_subscriber};
-use secrecy::{ExposeSecret, Secret};
 
 static TRACING: LazyLock<()> = LazyLock::new(|| {
     let default_filter_level = "debug".to_string();
@@ -55,21 +55,22 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
     let maintenance_settings = DatabaseSettings {
         database_name: "postgres".to_string(),
         username: "postgres".to_string(),
-        password: Secret::new("password".to_string()),
-        ..config.clone()
+        password: SecretBox::new(Box::new("password".to_string())),
+        port: config.port,
+        host: config.host.clone(),
+        require_ssl: config.require_ssl
     };
 
-    let mut connection = PgConnection::connect(maintenance_settings.connection_string()
-        .expose_secret())
-        .await
-        .expect("Failed to connect to Postgres");
+    let mut connection = PgConnection::connect_with(&maintenance_settings.connection_options())
+            .await
+            .expect("Failed to connect to Postgres");
 
     connection
         .execute(format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str())
         .await
         .expect("Failed to create database");
 
-    let connection_pool = PgPool::connect(config.connection_string().expose_secret())
+    let connection_pool = PgPool::connect_with(config.connection_options())
         .await
         .expect("Failed to connect to Postgres");
 
