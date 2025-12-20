@@ -8,7 +8,8 @@ echo "Building debug binary with new version..."
 cargo build
 
 echo "Building container image..."
-VERSION=$(cargo metadata --format-version 1 | jq -r '.packages[0].version')
+VERSION=$(cargo metadata --format-version 1 \
+  | jq -r '.packages[] | select(.name == "zero2prod") | .version')
 podman build -t zero2prod:$VERSION .
 podman tag zero2prod:$VERSION zero2prod:latest
 

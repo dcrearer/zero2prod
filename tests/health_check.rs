@@ -58,12 +58,12 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
         password: SecretBox::new(Box::new("password".to_string())),
         port: config.port,
         host: config.host.clone(),
-        require_ssl: config.require_ssl
+        require_ssl: config.require_ssl,
     };
 
     let mut connection = PgConnection::connect_with(&maintenance_settings.connection_options())
-            .await
-            .expect("Failed to connect to Postgres");
+        .await
+        .expect("Failed to connect to Postgres");
 
     connection
         .execute(format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str())
@@ -147,4 +147,31 @@ async fn subscribe_returns_a_400_when_data_is_missing(
         "The API did not fail with 400 Bad Request when the payload was {}.",
         error_message
     )
+}
+
+#[rstest]
+#[case("name=&email=ursula_le_guin%40gmail.com", "empty name")]
+#[case("name=Ursula&email=", "empty email")]
+#[case("name=Ursula&email=definitely-not-an-email", "invalid email")]
+#[tokio::test]
+async fn subscribe_returns_a_400_when_fields_are_present_but_invalid(
+    #[case] body: String,
+    #[case] description: &str,
+) {
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+
+    let response = client
+        .post(format!("{}/subscriptions", &app.address))
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .body(body)
+        .send()
+        .await
+        .expect("Failed to execute request.");
+
+    assert!(
+        400 == response.status(),
+        "The API did not return 400 BAD Request when the payload was {}.",
+        description
+    );
 }
