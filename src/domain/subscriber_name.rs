@@ -5,6 +5,21 @@ use unicode_segmentation::UnicodeSegmentation;
 pub struct SubscriberName(String);
 
 impl SubscriberName {
+    /// Parse and validate a subscriber name.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use zero2prod::domain::SubscriberName;
+    /// use assert2::assert;
+    ///
+    /// let name = SubscriberName::parse("John Doe".to_string()).unwrap();
+    /// assert!(name.as_ref() == "John Doe");
+    ///
+    /// // Invalid names are rejected
+    /// assert!(SubscriberName::parse("".to_string()).is_err());
+    /// assert!(SubscriberName::parse("a".repeat(257)).is_err());
+    /// ```
     pub fn parse(s: String) -> Result<SubscriberName, String> {
         let is_empty_or_whitespace = s.trim().is_empty();
         let is_too_long = s.graphemes(true).count() > 256;

@@ -38,8 +38,8 @@ cargo test
 
 ### Build Container
 ```bash
-podman build -t zero2prod:0.4.0 .
-podman run --rm -p 8000:8000 zero2prod:0.4.0
+podman build -t zero2prod:latest .
+podman run --rm -p 8000:8000 zero2prod:latest
 ```
 
 ## API Endpoints
@@ -51,7 +51,7 @@ podman run --rm -p 8000:8000 zero2prod:0.4.0
 
 ## Project Structure
 
-```
+```text
 zero2prod/
 ├── src/
 │   ├── main.rs              # Application entry point
@@ -76,14 +76,14 @@ zero2prod/
 ## Architecture
 
 ### Module Dependencies
-```
-main → configuration → startup → routes
-  ↓
-telemetry (logging)
-  ↓
+```text
+main -> telemetry -> configuration -> startup -> routes
+  |
 PgPool (database)
-  ↓
-HttpServer (actix-web) → health_check + subscriptions
+  |
+EmailClient
+  |
+HttpServer (actix-web) -> health_check + subscriptions
 ```
 
 ### Request Flow

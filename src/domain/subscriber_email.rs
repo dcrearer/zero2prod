@@ -5,6 +5,21 @@ use validator::ValidateEmail;
 pub struct SubscriberEmail(String);
 
 impl SubscriberEmail {
+    /// Parse and validate a subscriber email address.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use zero2prod::domain::SubscriberEmail;
+    /// use assert2::assert;
+    ///
+    /// let email = SubscriberEmail::parse("test@example.com".to_string()).unwrap();
+    /// assert!(email.as_ref() == "test@example.com");
+    ///
+    /// // Invalid emails are rejected
+    /// assert!(SubscriberEmail::parse("".to_string()).is_err());
+    /// assert!(SubscriberEmail::parse("invalid-email".to_string()).is_err());
+    /// ```
     pub fn parse(s: String) -> Result<SubscriberEmail, String> {
         if s.validate_email() {
             Ok(Self(s))

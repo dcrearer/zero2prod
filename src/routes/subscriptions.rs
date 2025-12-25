@@ -58,6 +58,7 @@ pub async fn insert_subscriber(
     Ok(())
 }
 
+// type-safe conversion from raw form data to validated domain objects
 impl TryFrom<FormData> for NewSubscriber {
     type Error = String;
     fn try_from(value: FormData) -> Result<Self, Self::Error> {

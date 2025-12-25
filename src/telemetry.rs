@@ -6,6 +6,19 @@ use tracing_log::LogTracer;
 use tracing_subscriber::fmt::MakeWriter;
 use tracing_subscriber::{EnvFilter, Registry, layer::SubscriberExt};
 
+/// Create a tracing subscriber with JSON formatting.
+///
+/// # Examples
+///
+/// ```
+/// use zero2prod::telemetry::get_subscriber;
+///
+/// let subscriber = get_subscriber(
+///     "test".to_string(),
+///     "info".to_string(),
+///     std::io::stdout
+/// );
+/// ```
 pub fn get_subscriber<Sink>(
     name: String,
     env_filter: String,

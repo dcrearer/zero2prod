@@ -31,7 +31,6 @@ serde-aux = "4"
 unicode-segmentation = "1"
 validator = "0.18"
 
-
 [dependencies.sqlx]
 version = "0.8"
 default-features = false
@@ -44,11 +43,18 @@ features = [
     "migrate"
 ]
 
+[dependencies.reqwest]
+version = "0.12"
+default-features = false
+features = ["json", "rustls-tls"]
+
 [dev-dependencies]
-reqwest = "0.12"
 assert2 = "0.3"
 rstest = "0.26"
 fake = "2.9"
 quickcheck = "1.0"
 quickcheck_macros = "1"
 rand = "0.8"
+tokio = { version = "1", features = ["rt", "macros"] }
+wiremock = "0.6"
+serde_json = "1"
