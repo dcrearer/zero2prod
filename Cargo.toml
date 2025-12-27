@@ -30,6 +30,7 @@ tracing-actix-web = "0.7"
 serde-aux = "4"
 unicode-segmentation = "1"
 validator = "0.18"
+rand = {  version = "0.8", features = ["std_rng"] }
 
 [dependencies.sqlx]
 version = "0.8"
@@ -54,7 +55,7 @@ rstest = "0.26"
 fake = "2.9"
 quickcheck = "1.0"
 quickcheck_macros = "1"
-rand = "0.8"
 tokio = { version = "1", features = ["rt", "macros"] }
 wiremock = "0.6"
 serde_json = "1"
+linkify = "0.10"
