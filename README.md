@@ -2,7 +2,7 @@
 
 A production-ready newsletter service built with Rust, featuring subscription management, health monitoring, and PostgreSQL integration.
 
-**Version:** 0.4.0
+**Version:** 0.8.0
 
 ## Features
 
@@ -10,7 +10,8 @@ A production-ready newsletter service built with Rust, featuring subscription ma
 - **PostgreSQL Integration** - Type-safe database queries with sqlx
 - **Structured Logging** - JSON-formatted tracing with Bunyan
 - **Configuration Management** - YAML-based settings with environment overrides
-- **Security** - Secret handling with secrecy crate
+- **Email Confirmation** - Two-step subscription process with email verification
+- **Token Management** - Secure subscription token generation and validation
 - **Containerized** - Docker/Podman support with multi-stage builds
 - **Database Migrations** - Automated schema management
 
@@ -44,10 +45,11 @@ podman run --rm -p 8000:8000 zero2prod:latest
 
 ## API Endpoints
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/health_check` | Health monitoring endpoint |
-| POST | `/subscriptions` | Newsletter subscription (form data: name, email) |
+| Method | Path                     | Description                                                   |
+|--------|--------------------------|---------------------------------------------------------------|
+| GET    | `/health_check`          | Health monitoring endpoint                                    |
+| POST   | `/subscriptions`         | Newsletter subscription (form data: name, email)              |
+| GET    | `/subscriptions/confirm` | Email confirmation endpoint (query param: subscription_token) |
 
 ## Project Structure
 
@@ -59,12 +61,24 @@ zero2prod/
 │   ├── configuration.rs     # Settings & database config
 │   ├── startup.rs           # HTTP server setup
 │   ├── telemetry.rs         # Logging configuration
+│   ├── email_client.rs      # Email service integration
+│   ├── domain/              # Domain models and validation
+│   │   ├── mod.rs
+│   │   ├── new_subscriber.rs
+│   │   ├── subscriber_email.rs
+│   │   └── subscriber_name.rs
 │   └── routes/
 │       ├── mod.rs
 │       ├── health_check.rs  # Health endpoint
-│       └── subscriptions.rs # Subscription endpoint
+│       ├── subscriptions.rs # Subscription endpoint
+│       └── subscriptions_confirm.rs # Email confirmation
 ├── tests/
-│   └── health_check.rs      # Integration tests
+│   └── api/                 # Integration tests
+│       ├── main.rs
+│       ├── helpers.rs
+│       ├── health_check.rs
+│       ├── subscriptions.rs
+│       └── subscriptions_confirm.rs
 ├── migrations/              # Database schema
 ├── scripts/
 │   ├── init_db.sh          # Database initialization
@@ -83,7 +97,7 @@ PgPool (database)
   |
 EmailClient
   |
-HttpServer (actix-web) -> health_check + subscriptions
+HttpServer (actix-web) -> health_check + subscriptions + subscriptions_confirm
 ```
 
 ### Request Flow
@@ -129,4 +143,4 @@ cargo nextest run  # Parallel test execution
 ```
 
 ---
-*Last updated: 2025-12-19*
+*Last updated: 2025-12-27*

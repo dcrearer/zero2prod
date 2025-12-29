@@ -19,7 +19,6 @@ pub struct Application {
 impl Application {
     pub async fn build(configuration: Settings) -> Result<Self, std::io::Error> {
         let connection_pool = get_connection_pool(&configuration.database);
-        // PgPoolOptions::new().connect_lazy_with(configuration.database.connection_options());
         let sender_email = configuration
             .email_client
             .sender()

@@ -32,6 +32,8 @@ where
 
     let formatting_layer = BunyanFormattingLayer::new(name, sink);
 
+    // Registry is a Subscriber around which multiple Layers implementing various behaviors may be added.
+    // Subscriber is a Trait representing the functions required to collect trace data.
     Registry::default()
         .with(env_filter)
         .with(JsonStorageLayer)
@@ -39,6 +41,8 @@ where
 }
 
 pub fn init_subscriber(subscriber: impl Subscriber + Send + Sync) {
+    // LogTracer converts all log records into tracing Events
+    // init sets a LogTracer as the global logger for the log crate
     LogTracer::init().expect("Failed to set logger");
     set_global_default(subscriber).expect("Failed to set subscriber");
 }
