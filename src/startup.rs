@@ -1,7 +1,7 @@
 //! src/startup.rs
 use crate::configuration::{DatabaseSettings, Settings};
 use crate::email_client::EmailClient;
-use crate::routes::{confirm, health_check, subscribe};
+use crate::routes::{confirm, health_check, publish_newsletter, subscribe};
 use actix_web::dev::Server;
 use actix_web::{App, HttpServer, web};
 use sqlx::PgPool;
@@ -23,7 +23,9 @@ impl Application {
             .email_client
             .sender()
             .expect("Invalid sender email address");
+
         let timeout = configuration.email_client.timeout();
+
         let email_client = EmailClient::new(
             configuration.email_client.base_url,
             sender_email,
@@ -72,6 +74,7 @@ pub fn run(
             .route("/health_check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
             .route("/subscriptions/confirm", web::get().to(confirm))
+            .route("/newsletters", web::post().to(publish_newsletter))
             .app_data(db_pool.clone())
             .app_data(email_client.clone())
             .app_data(base_url.clone())
