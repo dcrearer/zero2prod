@@ -125,3 +125,25 @@ async fn newsletters_return_400_for_invalid_data(
         error_message
     );
 }
+
+#[tokio::test]
+async fn requests_missing_authorization_are_rejected() {
+    let app = spawn_app().await;
+
+    let response = reqwest::Client::new()
+        .post(format!("{}/newsletters", &app.address))
+        .json(&serde_json::json!({
+            "title": "Newsletter",
+            "content": {
+                "text": "Newsletter body as plain text",
+                "html": "<p>Newsletter body as html</p>"
+            }
+        }))
+        .send()
+        .await
+        .expect("Falied to execute request");
+
+    // Assert
+    assert!(401 == response.status());
+    assert!(r#"Basic realm="publish""# == response.headers()["WWW-Authenticate"]);
+}
