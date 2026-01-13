@@ -2,6 +2,7 @@
 use crate::helpers::{ConfirmationLinks, TestApp, spawn_app};
 use assert2::assert;
 use rstest::rstest;
+use uuid::Uuid;
 use wiremock::matchers::{any, method, path};
 use wiremock::{Mock, ResponseTemplate};
 
@@ -144,6 +145,57 @@ async fn requests_missing_authorization_are_rejected() {
         .expect("Falied to execute request");
 
     // Assert
+    assert!(401 == response.status());
+    assert!(r#"Basic realm="publish""# == response.headers()["WWW-Authenticate"]);
+}
+
+#[tokio::test]
+async fn non_existing_user_is_rejected() {
+    let app = spawn_app().await;
+    let username = Uuid::new_v4().to_string();
+    let password = Uuid::new_v4().to_string();
+
+    let response = reqwest::Client::new()
+        .post(format!("{}/newsletters", &app.address))
+        .basic_auth(username, Some(password))
+        .json(&serde_json::json!({
+            "title": "Newsletter",
+            "content": {
+                "text": "Newsletter body as plain text",
+                "html": "<p>Newsletter body as html</p>"
+            }
+        }))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    // Assert
+    assert!(401 == response.status());
+    assert!(r#"Basic realm="publish""# == response.headers()["WWW-Authenticate"]);
+}
+
+#[tokio::test]
+async fn invalid_password_is_rejected() {
+    let app = spawn_app().await;
+    let username = &app.test_user.username;
+    let password = Uuid::new_v4().to_string();
+
+    assert!(app.test_user.password != password);
+
+    let response = reqwest::Client::new()
+        .post(format!("{}/newsletters", &app.address))
+        .basic_auth(username, Some(password))
+        .json(&serde_json::json!({
+            "title": "Newsletter",
+            "content": {
+                "text": "Newsletter body as plain text",
+                "html": "<p>Newsletter body as html</p>"
+            }
+        }))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
     assert!(401 == response.status());
     assert!(r#"Basic realm="publish""# == response.headers()["WWW-Authenticate"]);
 }
