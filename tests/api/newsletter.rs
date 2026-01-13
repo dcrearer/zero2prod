@@ -138,11 +138,6 @@ async fn newsletters_return_400_for_invalid_data(
 async fn requests_missing_authorization_are_rejected() {
     let app = spawn_app().await;
 
-    // app.post_login(&serde_json::json!({
-    //     "username": &app.test_user.username,
-    //     "password": &app.test_user.password,
-    // })).await;
-
     let title = "Newsletter";
     let html_content = "<p>Newsletter body as html</p>";
     let text_content = "Newsletter body as plain text";
