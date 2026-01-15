@@ -3,7 +3,9 @@ use crate::authentication::reject_anonymous_users;
 use crate::configuration::{DatabaseSettings, Settings};
 use crate::email_client::EmailClient;
 use crate::routes::{admin_dashboard, change_password, change_password_form, log_out};
-use crate::routes::{confirm, health_check, publish_newsletter, publish_newsletter_form, subscribe};
+use crate::routes::{
+    confirm, health_check, publish_newsletter, publish_newsletter_form, subscribe,
+};
 use crate::routes::{home, login, login_form};
 use actix_session::SessionMiddleware;
 use actix_session::storage::RedisSessionStore;
@@ -21,7 +23,6 @@ use sqlx::postgres::PgPoolOptions;
 use std::net::TcpListener;
 use tracing_actix_web::TracingLogger;
 
-
 pub struct ApplicationBaseUrl(pub String);
 
 pub struct Application {
@@ -35,19 +36,7 @@ pub struct HmacSecret(pub SecretString);
 impl Application {
     pub async fn build(configuration: Settings) -> Result<Self, anyhow::Error> {
         let connection_pool = get_connection_pool(&configuration.database);
-        let sender_email = configuration
-            .email_client
-            .sender()
-            .expect("Invalid sender email address");
-
-        let timeout = configuration.email_client.timeout();
-
-        let email_client = EmailClient::new(
-            configuration.email_client.base_url,
-            sender_email,
-            configuration.email_client.authorization_token,
-            timeout,
-        );
+        let email_client = configuration.email_client.client();
 
         let address = format!(
             "{}:{}",

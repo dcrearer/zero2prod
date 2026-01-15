@@ -1,0 +1,441 @@
+{
+	"info": {
+		"_postman_id": "d5ac68e1-4b75-40ac-bac5-7992441af03b",
+		"name": "Zero2Prod API",
+		"description": "API collection for the zero2prod Rust web application",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4486057"
+	},
+	"item": [
+		{
+			"name": "Dev",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dev_url}}/health_check",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"health_check"
+							]
+						},
+						"description": "Check if the API is running and healthy"
+					},
+					"response": []
+				},
+				{
+					"name": "Home",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dev_url}}/",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Subscribe",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate random name and email",
+									"const names = ['John', 'Jane', 'Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank'];",
+									"const surnames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis'];",
+									"const domains = ['example.com', 'test.com', 'demo.org', 'sample.net'];",
+									"",
+									"const randomName = names[Math.floor(Math.random() * names.length)];",
+									"const randomSurname = surnames[Math.floor(Math.random() * surnames.length)];",
+									"const randomDomain = domains[Math.floor(Math.random() * domains.length)];",
+									"const timestamp = Date.now();",
+									"",
+									"pm.globals.set('random_name', `${randomName} ${randomSurname}`);",
+									"pm.globals.set('random_email', `${randomName.toLowerCase()}.${randomSurname.toLowerCase()}.${timestamp}@${randomDomain}`);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "{{random_name}}",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "{{random_email}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{dev_url}}/subscriptions",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"subscriptions"
+							]
+						},
+						"description": "Subscribe a user to the newsletter with random data"
+					},
+					"response": []
+				},
+				{
+					"name": "Subscribe - Invalid Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Test User",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "invalid-email",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{dev_url}}/subscriptions",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"subscriptions"
+							]
+						},
+						"description": "Test subscription with invalid email format"
+					},
+					"response": []
+				},
+				{
+					"name": "Subscribe - Missing Data",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Test User",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{dev_url}}/subscriptions",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"subscriptions"
+							]
+						},
+						"description": "Test subscription with missing email field"
+					},
+					"response": []
+				},
+				{
+					"name": "Confirmation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dev_url}}/subscriptions/confirm?subscription_token={}",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"subscriptions",
+								"confirm"
+							],
+							"query": [
+								{
+									"key": "subscription_token",
+									"value": "{}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Form",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dev_url}}/login",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {},
+						"followRedirects": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "cybersecurity",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{dev_url}}/login",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dev_url}}/admin/dashboard",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"admin",
+								"dashboard"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Newsletter Form",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dev_url}}/admin/newsletters",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"admin",
+								"newsletters"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Publish Newsletter",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Newsletter title",
+									"type": "text"
+								},
+								{
+									"key": "text_content",
+									"value": "Newsletter body as plain text",
+									"type": "text"
+								},
+								{
+									"key": "html_content",
+									"value": "<p>Newsletter body as HTML</p>",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{dev_url}}/admin/newsletters",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"admin",
+								"newsletters"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password Form",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dev_url}}/admin/password",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"admin",
+								"password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "current_password",
+									"value": "cybersecurity",
+									"type": "text"
+								},
+								{
+									"key": "new_password",
+									"value": "new-password",
+									"type": "text"
+								},
+								{
+									"key": "new_password_check",
+									"value": "new-password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{dev_url}}/admin/password",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"admin",
+								"password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{dev_url}}/admin/logout",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"admin",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "dev_url",
+			"value": "http://127.0.0.1:8000"
+		},
+		{
+			"key": "prod_url",
+			"value": ""
+		}
+	]
+}
