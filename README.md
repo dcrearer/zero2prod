@@ -2,7 +2,7 @@
 
 A production-ready newsletter service built with Rust, featuring subscription management, authentication, newsletter publishing with idempotency, background email delivery, and PostgreSQL integration.
 
-**Version:** 0.15.0
+**Version:** 0.16.0
 
 ## Features
 
