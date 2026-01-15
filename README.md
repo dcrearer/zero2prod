@@ -36,11 +36,6 @@ A production-ready newsletter service built with Rust, featuring subscription ma
 cargo run
 ```
 
-### Run Background Worker
-```bash
-cargo run --bin issue_delivery_worker
-```
-
 ### Run Tests
 ```bash
 cargo test
