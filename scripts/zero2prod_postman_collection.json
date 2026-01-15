@@ -293,6 +293,21 @@
 				},
 				{
 					"name": "Publish Newsletter",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate UUID for idempotency key",
+									"const uuid = require('uuid');",
+									"pm.globals.set('idempotency_key', uuid.v4());"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -313,6 +328,11 @@
 									"key": "html_content",
 									"value": "<p>Newsletter body as HTML</p>",
 									"type": "text"
+								},
+								{
+									"key": "idempotency_key",
+									"value": "{{idempotency_key}}",
+									"type": "text"
 								}
 							]
 						},
@@ -325,7 +345,8 @@
 								"admin",
 								"newsletters"
 							]
-						}
+						},
+						"description": "Publish a newsletter with idempotency key to prevent duplicate sends"
 					},
 					"response": []
 				},

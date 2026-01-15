@@ -2,12 +2,13 @@
 
 A production-ready newsletter service built with Rust, featuring subscription management, authentication, newsletter publishing with idempotency, background email delivery, and PostgreSQL integration.
 
-**Version:** 0.15.0
+**Version:** 0.16.0
 
 ## Features
 
 - **RESTful API** - Health check, subscription, authentication, and admin endpoints
 - **PostgreSQL Integration** - Type-safe database queries with sqlx
+- **Redis Session Store** - Fast, distributed session management with Redis backend
 - **Structured Logging** - JSON-formatted tracing with Bunyan
 - **Configuration Management** - YAML-based settings with environment overrides
 - **Email Confirmation** - Two-step subscription process with email verification
@@ -24,21 +25,22 @@ A production-ready newsletter service built with Rust, featuring subscription ma
 ### Prerequisites
 - Rust 1.92+ 
 - PostgreSQL 15+
-- Podman|Docker
+- Podman | Docker
+- Redis 7
 
 ### Database Setup
 ```bash
 ./scripts/init_db.sh
 ```
 
+### Redis Setup
+```bash
+./scripts/init_redis.sh
+```
+
 ### Run Locally
 ```bash
 cargo run
-```
-
-### Run Background Worker
-```bash
-cargo run --bin issue_delivery_worker
 ```
 
 ### Run Tests
