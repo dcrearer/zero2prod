@@ -3,7 +3,7 @@
 ## Project Information
 - **Project Type**: Brownfield
 - **Start Date**: 2026-06-11T00:00:00Z
-- **Current Stage**: INCEPTION - Reverse Engineering
+- **Current Stage**: INCEPTION - Application Design
 
 ## Workspace State
 - **Existing Code**: Yes
@@ -19,27 +19,41 @@
 - **Structure patterns**: See code-generation.md Critical Rules
 
 ## Extension Configuration
-- **Security Baseline**: Not yet configured (will be determined in Requirements Analysis)
-- **Property-Based Testing**: Not yet configured (will be determined in Requirements Analysis)
+| Extension | Enabled | Decided At |
+|---|---|---|
+| Security Baseline | Yes | Requirements Analysis |
+| Property-Based Testing | Partial | Requirements Analysis |
 
 ## Reverse Engineering Status
 - [x] Reverse Engineering - Completed on 2026-06-11T00:00:00Z
 - **Artifacts Location**: aidlc-docs/inception/reverse-engineering/
 - **Total Files Analyzed**: 36 source files + 13 migrations + configuration files
 
+## Execution Plan Summary
+- **Total Stages**: 44 stages (3 INCEPTION + 40 CONSTRUCTION per-unit + 1 BUILD & TEST)
+- **Stages to Execute**: Application Design, Units Generation, 8 units × 5 stages each, Build & Test
+- **Stages to Skip**: User Stories (infrastructure migration, no user-facing story value)
+- **Implementation Units**: 8 units (Network, Database, Cache, Compute, Worker, Auth, Observability, CI/CD)
+- **Estimated Timeline**: 12 weeks (phased approach)
+
 ## Stage Progress
 ### INCEPTION PHASE
 - [x] Workspace Detection (COMPLETED)
 - [x] Reverse Engineering (COMPLETED)
-- [ ] Requirements Analysis (PENDING)
-- [ ] User Stories (CONDITIONAL)
-- [ ] Workflow Planning (PENDING)
-- [ ] Application Design (CONDITIONAL)
-- [ ] Units Generation (CONDITIONAL)
+- [x] Requirements Analysis (COMPLETED)
+- [ ] User Stories (SKIP - infrastructure migration)
+- [x] Workflow Planning (COMPLETED)
+- [ ] Application Design (EXECUTE - high-level AWS architecture design)
+- [ ] Units Generation (EXECUTE - decompose into 8 implementation units)
 
 ### CONSTRUCTION PHASE
-- [ ] Per-Unit Loop (PENDING)
-- [ ] Build and Test (PENDING)
+- [ ] Per-Unit Design Stages (EXECUTE - 8 units × 5 stages each):
+  - [ ] Functional Design (per unit)
+  - [ ] NFR Requirements (per unit)
+  - [ ] NFR Design (per unit)
+  - [ ] Infrastructure Design (per unit)
+  - [ ] Code Generation (per unit - ALWAYS)
+- [ ] Build and Test (EXECUTE - ALWAYS)
 
 ### OPERATIONS PHASE
 - [ ] Operations (PLACEHOLDER)
